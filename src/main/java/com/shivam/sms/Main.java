@@ -29,9 +29,10 @@ public class Main {
             System.out.println("3. Update Student");
             System.out.println("4. Delete Student");
             System.out.println("5. Search Student by ID");
+            System.out.println("6. Search Students by Name");
             System.out.println("6. Exit");
 
-            int choice = readInteger("Enter your choice: ", 1, 6);
+            int choice = readInteger("Enter your choice: ", 1, 7);
 
             switch (choice) {
                 case 1:
@@ -52,6 +53,10 @@ public class Main {
                     break;
 
                 case 6:
+                    searchStudentsByName();
+                    break;
+
+                case 7:
                     System.out.println("Thank you for using the application!");
                     return;
 
@@ -195,33 +200,64 @@ public class Main {
             }
         }
     }
-    
-private static void searchStudent() {
-    System.out.println("\n--- Search Student ---");
 
-    int id = readInteger(
-        "Enter student ID to search: ", 1, Integer.MAX_VALUE
-    );
+    private static void searchStudent() {
+        System.out.println("\n--- Search Student ---");
+
+        int id = readInteger(
+                "Enter student ID to search: ", 1, Integer.MAX_VALUE);
+
+        try {
+            Student student = studentDAO.getStudentById(id);
+
+            if (student == null) {
+                System.out.println("No student found with ID: " + id);
+                return;
+            }
+
+            System.out.println("\n----- STUDENT DETAILS -----");
+            System.out.println("ID: " + student.getId());
+            System.out.println("Name: " + student.getName());
+            System.out.println("Email: " + student.getEmail());
+            System.out.println("Course: " + student.getCourse());
+            System.out.println("Age: " + student.getAge());
+            System.out.println("---------------------------");
+
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+private static void searchStudentsByName() {
+    System.out.println("\n--- Search Students by Name ---");
+
+    String name = readRequiredText("Enter student name or part of name: ");
 
     try {
-        Student student = studentDAO.getStudentById(id);
+        List<Student> students = studentDAO.searchStudentsByName(name);
 
-        if (student == null) {
-            System.out.println("No student found with ID: " + id);
+        if (students.isEmpty()) {
+            System.out.println("No students found matching: " + name);
             return;
         }
 
-        System.out.println("\n----- STUDENT DETAILS -----");
-        System.out.println("ID: " + student.getId());
-        System.out.println("Name: " + student.getName());
-        System.out.println("Email: " + student.getEmail());
-        System.out.println("Course: " + student.getCourse());
-        System.out.println("Age: " + student.getAge());
-        System.out.println("---------------------------");
+        System.out.println("\n----- SEARCH RESULTS -----");
+
+        for (Student student : students) {
+            System.out.println("ID: " + student.getId());
+            System.out.println("Name: " + student.getName());
+            System.out.println("Email: " + student.getEmail());
+            System.out.println("Course: " + student.getCourse());
+            System.out.println("Age: " + student.getAge());
+            System.out.println("--------------------------");
+        }
+
+        System.out.println("Total students found: " + students.size());
 
     } catch (IllegalStateException e) {
         System.out.println(e.getMessage());
     }
 }
+
 
 }

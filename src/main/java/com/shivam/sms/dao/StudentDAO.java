@@ -147,4 +147,42 @@ public Student getStudentById(int id) {
     return null;
 }
 
+public List<Student> searchStudentsByName(String name) {
+    List<Student> students = new ArrayList<>();
+
+    String sql = "SELECT id, name, email, course, age "
+               + "FROM students WHERE name LIKE ? ORDER BY name";
+
+    try (
+        Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)
+    ) {
+        statement.setString(1, "%" + name.trim() + "%");
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Student student = new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("course"),
+                    resultSet.getInt("age")
+                );
+
+                students.add(student);
+            }
+        }
+
+        return students;
+
+    } catch (SQLException e) {
+        logDatabaseError("searching students by name", e);
+        throw new IllegalStateException(
+            "Unable to search students. Check the database connection.",
+            e
+        );
+    }
+}
+
+
 }
