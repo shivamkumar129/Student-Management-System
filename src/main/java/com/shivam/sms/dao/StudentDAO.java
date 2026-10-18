@@ -114,4 +114,37 @@ public class StudentDAO {
                 + ". SQLState: " + e.getSQLState()
                 + ", Error code: " + e.getErrorCode());
     }
+    
+public Student getStudentById(int id) {
+    String sql = "SELECT id, name, email, course, age FROM students WHERE id = ?";
+
+    try (
+        Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)
+    ) {
+        statement.setInt(1, id);
+
+        try (ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                return new Student(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("email"),
+                    resultSet.getString("course"),
+                    resultSet.getInt("age")
+                );
+            }
+        }
+
+    } catch (SQLException e) {
+        logDatabaseError("searching for student", e);
+        throw new IllegalStateException(
+            "Unable to search for the student. Check the database connection.",
+            e
+        );
+    }
+
+    return null;
+}
+
 }

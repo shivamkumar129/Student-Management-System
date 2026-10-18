@@ -28,9 +28,10 @@ public class Main {
             System.out.println("2. View All Students");
             System.out.println("3. Update Student");
             System.out.println("4. Delete Student");
-            System.out.println("5. Exit");
+            System.out.println("5. Search Student by ID");
+            System.out.println("6. Exit");
 
-            int choice = readInteger("Enter your choice: ", 1, 5);
+            int choice = readInteger("Enter your choice: ", 1, 6);
 
             switch (choice) {
                 case 1:
@@ -45,9 +46,15 @@ public class Main {
                 case 4:
                     deleteStudent();
                     break;
+
                 case 5:
+                    searchStudent();
+                    break;
+
+                case 6:
                     System.out.println("Thank you for using the application!");
                     return;
+
                 default:
                     System.out.println("Invalid choice. Select 1 to 5.");
             }
@@ -72,32 +79,30 @@ public class Main {
         }
     }
 
-   
-private static void viewStudents() {
-    try {
-        List<Student> students = studentDAO.getAllStudents();
+    private static void viewStudents() {
+        try {
+            List<Student> students = studentDAO.getAllStudents();
 
-        if (students.isEmpty()) {
-            System.out.println("No students found.");
-            return;
+            if (students.isEmpty()) {
+                System.out.println("No students found.");
+                return;
+            }
+
+            System.out.println("\n----- STUDENT RECORDS -----");
+
+            for (Student student : students) {
+                System.out.println("ID: " + student.getId());
+                System.out.println("Name: " + student.getName());
+                System.out.println("Email: " + student.getEmail());
+                System.out.println("Course: " + student.getCourse());
+                System.out.println("Age: " + student.getAge());
+                System.out.println("---------------------------");
+            }
+
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
         }
-
-        System.out.println("\n----- STUDENT RECORDS -----");
-
-        for (Student student : students) {
-            System.out.println("ID: " + student.getId());
-            System.out.println("Name: " + student.getName());
-            System.out.println("Email: " + student.getEmail());
-            System.out.println("Course: " + student.getCourse());
-            System.out.println("Age: " + student.getAge());
-            System.out.println("---------------------------");
-        }
-
-    } catch (IllegalStateException e) {
-        System.out.println(e.getMessage());
     }
-}
-
 
     private static void updateStudent() {
         System.out.println("\n--- Update Student ---");
@@ -162,7 +167,7 @@ private static void viewStudents() {
 
             if (email.length() <= 100
                     && email.matches(
-                    "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
                 return email.toLowerCase();
             }
 
@@ -190,4 +195,33 @@ private static void viewStudents() {
             }
         }
     }
+    
+private static void searchStudent() {
+    System.out.println("\n--- Search Student ---");
+
+    int id = readInteger(
+        "Enter student ID to search: ", 1, Integer.MAX_VALUE
+    );
+
+    try {
+        Student student = studentDAO.getStudentById(id);
+
+        if (student == null) {
+            System.out.println("No student found with ID: " + id);
+            return;
+        }
+
+        System.out.println("\n----- STUDENT DETAILS -----");
+        System.out.println("ID: " + student.getId());
+        System.out.println("Name: " + student.getName());
+        System.out.println("Email: " + student.getEmail());
+        System.out.println("Course: " + student.getCourse());
+        System.out.println("Age: " + student.getAge());
+        System.out.println("---------------------------");
+
+    } catch (IllegalStateException e) {
+        System.out.println(e.getMessage());
+    }
+}
+
 }
